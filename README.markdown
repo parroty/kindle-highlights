@@ -36,35 +36,35 @@ The kindle-highlights gem depends on the ruby-aaws gem to grab data about the pr
 
 **Use(v0.06)**
 
-  require 'kindle-highlights'
+	require 'kindle-highlights'
 
-  # to create a new KindleHighlight object, give it your Amazon email address and password
-  kindle = KindleHighlight.new("foo@bar.com", "password", { :page_limit => 100, :wait_time => 2 }) do | h |
-    puts "loading... [#{h.books.last.title}]"
-  end
+	# to create a new KindleHighlight object, give it your Amazon email address and password
+	kindle = KindleHighlight.new("foo@bar.com", "password", { :page_limit => 100, :wait_time => 2 }) do | h |
+		puts "loading... [#{h.books.last.title}]"
+	end
 
-  File.open("out.xml", "w") do | f |
-    f.puts kindle.to_xml
-  end
+	File.open("out.xml", "w") do | f |
+		f.puts kindle.to_xml
+	end
 
 **Output(v0.06)**
 
-  <?xml version="1.0"?>
-  <root>
-    <books>
-      <asin>ASIN</asin>
-      <title>TITLE</title>
-      <author>AUTHOR</author>
-      <highlights>
-        <annotation_id>ANNOTATION_ID1</annotation_id>
-        <content>CONTENT1</content>
-      </highlights>
-      <highlights>
-        <annotation_id>ANNOTATION_ID1</annotation_id>
-        <content>CONTENT1</content>
-      </highlights>
-    </books>
-  </root>
+	<?xml version="1.0"?>
+	<root>
+		<books>
+			<asin>ASIN</asin>
+			<title>TITLE</title>
+			<author>AUTHOR</author>
+			<highlights>
+				<annotation_id>ANNOTATION_ID1</annotation_id>
+				<content>CONTENT1</content>
+			</highlights>
+			<highlights>
+				<annotation_id>ANNOTATION_ID2</annotation_id>
+				<content>CONTENT2</content>
+			</highlights>
+		</books>
+	</root>
 
 **Updates**
 
