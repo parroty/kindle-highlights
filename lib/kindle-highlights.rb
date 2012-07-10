@@ -3,13 +3,18 @@ require 'mechanize'
 
 class KindleHighlight
   attr_accessor :highlights, :books
-	
-  def initialize(email_address, password)
+
+  REPEAT_WAIT_TIME = 5
+
+  def initialize(email_address, password, options)
     @agent = Mechanize.new
     page = @agent.get("https://www.amazon.com/ap/signin?openid.return_to=https%3A%2F%2Fkindle.amazon.com%3A443%2Fauthenticate%2Flogin_callback%3Fwctx%3D%252F&pageId=amzn_kindle&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.assoc_handle=amzn_kindle&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select")
     @amazon_form = page.form('signIn')
     @amazon_form.email = email_address
     @amazon_form.password = password
+
+    @page_limit = options[:page_limit] || 1
+
     scrape_highlights
   end
 
@@ -17,8 +22,15 @@ class KindleHighlight
     signin_submission = @agent.submit(@amazon_form)
     highlights_page = @agent.click(signin_submission.link_with(:text => /Your Highlights/))
 
-    self.books      = collect_book(highlights_page)
-    self.highlights = collect_highlight(highlights_page)
+    self.books      = Array.new
+    self.highlights = Array.new
+    @page_limit.times do
+      self.books      += collect_book(highlights_page)
+      self.highlights += collect_highlight(highlights_page)
+
+      highlights_page = get_next_page(highlights_page)
+      sleep(REPEAT_WAIT_TIME)
+    end
   end
 
 private
@@ -28,6 +40,11 @@ private
 
   def collect_highlight(page)
     page.search(".//div[@class='highlightRow yourHighlight']").map { |h| Highlight.new(h) }
+  end
+
+  def get_next_page(page)
+    next_link = "https://kindle.amazon.com" + page.search(".//a[@id='nextBookLink']").attribute("href").value
+    @agent.get(next_link)
   end
 end
 
