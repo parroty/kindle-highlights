@@ -7,14 +7,7 @@ There's currently no Kindle API, so I built a scraper.
 
 **Required gems**
 
-<strike>* ruby-aaws</strike>
 * Mechanize
-
-<strike>The ruby-aaws gem assumes you have an Associates tracking code, and Product API credentials.  A handy guide for setting up the ruby-aaws gem can be found at:
-
-[http://snippets.aktagon.com/snippets/413-How-to-access-Amazon-product-data-with-Ruby-AWS-and-the-Amazon-Associates-Web-Services-API](http://snippets.aktagon.com/snippets/413-How-to-access-Amazon-product-data-with-Ruby-AWS-and-the-Amazon-Associates-Web-Services-API).
-
-The kindle-highlights gem depends on the ruby-aaws gem to grab data about the product from which the highlight came, and will not work without ruby-aaws being set up properly.</strike>
 
 **Install**
 	
@@ -77,7 +70,6 @@ XML output example
 
 **TODO**
 
-<strike>* Get all highlights; Amazon currently does an infinite-scroll at the page bottom which loads highlights dynamically.  Currently the gem only gets the first "page" of highlights.</strike>
 * Exception handling
 * Documentation
 * Tests
