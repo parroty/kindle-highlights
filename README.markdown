@@ -7,14 +7,14 @@ There's currently no Kindle API, so I built a scraper.
 
 **Required gems**
 
-* ruby-aaws
+<strike>* ruby-aaws</strike>
 * Mechanize
 
-The ruby-aaws gem assumes you have an Associates tracking code, and Product API credentials.  A handy guide for setting up the ruby-aaws gem can be found at:
+<strike>The ruby-aaws gem assumes you have an Associates tracking code, and Product API credentials.  A handy guide for setting up the ruby-aaws gem can be found at:
 
 [http://snippets.aktagon.com/snippets/413-How-to-access-Amazon-product-data-with-Ruby-AWS-and-the-Amazon-Associates-Web-Services-API](http://snippets.aktagon.com/snippets/413-How-to-access-Amazon-product-data-with-Ruby-AWS-and-the-Amazon-Associates-Web-Services-API).
 
-The kindle-highlights gem depends on the ruby-aaws gem to grab data about the product from which the highlight came, and will not work without ruby-aaws being set up properly.
+The kindle-highlights gem depends on the ruby-aaws gem to grab data about the product from which the highlight came, and will not work without ruby-aaws being set up properly.</strike>
 
 **Install**
 	
@@ -34,7 +34,7 @@ The kindle-highlights gem depends on the ruby-aaws gem to grab data about the pr
 		highlight.title # => title of the book from which the highlight is taken
 	end
 
-**Use(v0.06)**
+**Use (with v0.06)**
 
 	require 'kindle-highlights'
 
@@ -47,11 +47,12 @@ The kindle-highlights gem depends on the ruby-aaws gem to grab data about the pr
 		f.puts kindle.to_xml
 	end
 
-**Output(v0.06)**
+**Output (with v0.06)**
+XML output example
 
 	<?xml version="1.0"?>
-	<root>
-		<books>
+	<books>
+		<book>
 			<asin>ASIN</asin>
 			<title>TITLE</title>
 			<author>AUTHOR</author>
@@ -63,8 +64,8 @@ The kindle-highlights gem depends on the ruby-aaws gem to grab data about the pr
 				<annotation_id>ANNOTATION_ID2</annotation_id>
 				<content>CONTENT2</content>
 			</highlights>
-		</books>
-	</root>
+		</book>
+	</books>
 
 **Updates**
 
@@ -72,10 +73,11 @@ The kindle-highlights gem depends on the ruby-aaws gem to grab data about the pr
 * Added dependencies to Mechanize and ruby-aaws within gemspec (0.0.4)
 * Cache AWS Product API results in a Hash, keyed on ASIN, to save time (0.0.5)
 * Get Small response group from Amazon (0.0.5)
+* Added multiple pager load and xml output (0.0.6)
 
 **TODO**
 
-* Get all highlights; Amazon currently does an infinite-scroll at the page bottom which loads highlights dynamically.  Currently the gem only gets the first "page" of highlights.
+<strike>* Get all highlights; Amazon currently does an infinite-scroll at the page bottom which loads highlights dynamically.  Currently the gem only gets the first "page" of highlights.</strike>
 * Exception handling
 * Documentation
 * Tests

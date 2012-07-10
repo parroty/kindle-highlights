@@ -46,9 +46,9 @@ class KindleHighlight
     end
 
     builder = Nokogiri::XML::Builder.new do |xml|
-      xml.root {
-        xml.books {
-          self.books.each do | b |
+      xml.books {
+        self.books.each do | b |
+          xml.book {
             xml.asin b.asin
             xml.title b.title
             xml.author b.author
@@ -59,8 +59,8 @@ class KindleHighlight
                 xml.content h.content
               }
             end
-          end
-        }
+          }
+        end
       }
     end
     builder.to_xml
