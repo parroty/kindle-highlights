@@ -1,5 +1,6 @@
 require 'rubygems'
 require 'mechanize'
+require 'nokogiri'
 
 class KindleHighlight
   attr_accessor :highlights, :books
@@ -24,13 +25,40 @@ class KindleHighlight
 
     self.books      = Array.new
     self.highlights = Array.new
-    @page_limit.times do
+    @page_limit.times do | cnt |
       self.books      += collect_book(highlights_page)
       self.highlights += collect_highlight(highlights_page)
 
       highlights_page = get_next_page(highlights_page)
-      sleep(REPEAT_WAIT_TIME)
+      sleep(REPEAT_WAIT_TIME) if cnt != 0
     end
+  end
+
+  def to_xml
+    highlights_hash = Hash.new([].freeze)
+    self.highlights.each do | h |
+      highlights_hash[h.asin] += [h]
+    end
+
+    builder = Nokogiri::XML::Builder.new do |xml|
+      xml.root {
+        xml.books {
+          self.books.each do | b |
+            xml.asin b.asin
+            xml.title b.title
+            xml.author b.author
+
+            highlights_hash[b.asin].each do | h |
+              xml.highlights {
+                xml.annotation_id h.annotation_id
+                xml.content h.content
+              }
+            end
+          end
+        }
+      }
+    end
+    builder.to_xml
   end
 
 private
