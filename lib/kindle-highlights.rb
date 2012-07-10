@@ -5,7 +5,7 @@ require 'nokogiri'
 class KindleHighlight
   attr_accessor :highlights, :books
 
-  REPEAT_WAIT_TIME = 5
+  DEFAULT_WAIT_TIME = 5
 
   def initialize(email_address, password, options)
     @agent = Mechanize.new
@@ -15,6 +15,7 @@ class KindleHighlight
     @amazon_form.password = password
 
     @page_limit = options[:page_limit] || 1
+    @wait_time  = options[:wait_time]  || DEFAULT_WAIT_TIME
 
     scrape_highlights
   end
@@ -30,7 +31,8 @@ class KindleHighlight
       self.highlights += collect_highlight(highlights_page)
 
       highlights_page = get_next_page(highlights_page)
-      sleep(REPEAT_WAIT_TIME) if cnt != 0
+      break unless highlights_page
+      sleep(@wait_time) if cnt != 0
     end
   end
 
@@ -72,7 +74,11 @@ private
 
   def get_next_page(page)
     next_link = "https://kindle.amazon.com" + page.search(".//a[@id='nextBookLink']").attribute("href").value
-    @agent.get(next_link)
+    if next_link
+      @agent.get(next_link)
+    else
+      nil
+    end
   end
 end
 
