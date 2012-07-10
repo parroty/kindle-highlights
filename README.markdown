@@ -66,6 +66,7 @@ XML output example
 * Added dependencies to Mechanize and ruby-aaws within gemspec (0.0.4)
 * Cache AWS Product API results in a Hash, keyed on ASIN, to save time (0.0.5)
 * Get Small response group from Amazon (0.0.5)
+* Removed ruby-aaws and used the scraping instead (0.0.6)
 * Added multiple pager load and xml output (0.0.6)
 
 **TODO**
