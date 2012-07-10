@@ -73,9 +73,9 @@ private
   end
 
   def get_next_page(page)
-    next_link = "https://kindle.amazon.com" + page.search(".//a[@id='nextBookLink']").attribute("href").value
-    if next_link
-      @agent.get(next_link)
+    ret = page.search(".//a[@id='nextBookLink']")
+    if ret
+     @agent.get("https://kindle.amazon.com" + ret.attribute("href").value)
     else
       nil
     end
