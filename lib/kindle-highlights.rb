@@ -7,7 +7,7 @@ class KindleHighlight
 
   DEFAULT_WAIT_TIME = 5
 
-  def initialize(email_address, password, options)
+  def initialize(email_address, password, options, &block)
     @agent = Mechanize.new
     page = @agent.get("https://www.amazon.com/ap/signin?openid.return_to=https%3A%2F%2Fkindle.amazon.com%3A443%2Fauthenticate%2Flogin_callback%3Fwctx%3D%252F&pageId=amzn_kindle&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.assoc_handle=amzn_kindle&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select")
     @amazon_form = page.form('signIn')
@@ -16,6 +16,7 @@ class KindleHighlight
 
     @page_limit = options[:page_limit] || 1
     @wait_time  = options[:wait_time]  || DEFAULT_WAIT_TIME
+    @block = block
 
     scrape_highlights
   end
@@ -33,6 +34,8 @@ class KindleHighlight
       highlights_page = get_next_page(highlights_page)
       break unless highlights_page
       sleep(@wait_time) if cnt != 0
+
+      @block.call(self) if @block
     end
   end
 
@@ -73,9 +76,9 @@ private
   end
 
   def get_next_page(page)
-    ret = page.search(".//a[@id='nextBookLink']")
-    if ret
-     @agent.get("https://kindle.amazon.com" + ret.attribute("href").value)
+    ret = page.search(".//a[@id='nextBookLink']").first
+    if ret and ret.attribute("href")
+      @agent.get("https://kindle.amazon.com" + ret.attribute("href").value)
     else
       nil
     end
