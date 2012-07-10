@@ -40,6 +40,11 @@ There's currently no Kindle API, so I built a scraper.
 		f.puts kindle.to_xml
 	end
 
+#### options
+- page_limit : specifies maximum number of pages (books) to be loaded
+- wait_time : specifies wait time between each page load in seconds (default is 5 seconds)
+- block : call-back function which for each page load completion
+
 **Output (with v0.06)**
 XML output example
 
