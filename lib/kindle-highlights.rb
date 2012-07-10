@@ -17,17 +17,17 @@ class KindleHighlight
     signin_submission = @agent.submit(@amazon_form)
     highlights_page = @agent.click(signin_submission.link_with(:text => /Your Highlights/))
 
-    collected_books = Array.new
-    highlights_page.search(".//div[@class='bookMain yourHighlightsHeader']").each do |b|
-      collected_books << Book.new(b)
-    end
-    self.books = collected_books
+    self.books      = collect_book(highlights_page)
+    self.highlights = collect_highlight(highlights_page)
+  end
 
-    collected_highlights = Array.new
-    highlights_page.search(".//div[@class='highlightRow yourHighlight']").each do |h|
-      collected_highlights << Highlight.new(h)
-    end
-    self.highlights = collected_highlights
+private
+  def collect_book(page)
+    page.search(".//div[@class='bookMain yourHighlightsHeader']").map { |b| Book.new(b) }
+  end
+
+  def collect_highlight(page)
+    page.search(".//div[@class='highlightRow yourHighlight']").map { |h| Highlight.new(h) }
   end
 end
 
