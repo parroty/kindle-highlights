@@ -1,13 +1,8 @@
 require 'rubygems'
 require 'mechanize'
-require 'amazon/aws'
-require 'amazon/aws/search'
-
-include Amazon::AWS
-include Amazon::AWS::Search
 
 class KindleHighlight
-  attr_accessor :highlights
+  attr_accessor :highlights, :books
 	
   def initialize(email_address, password)
     @agent = Mechanize.new
@@ -21,11 +16,36 @@ class KindleHighlight
   def scrape_highlights
     signin_submission = @agent.submit(@amazon_form)
     highlights_page = @agent.click(signin_submission.link_with(:text => /Your Highlights/))
+
+    collected_books = Array.new
+    highlights_page.search(".//div[@class='bookMain yourHighlightsHeader']").each do |b|
+      collected_books << Book.new(b)
+    end
+    self.books = collected_books
+
     collected_highlights = Array.new
     highlights_page.search(".//div[@class='highlightRow yourHighlight']").each do |h|
       collected_highlights << Highlight.new(h)
     end
     self.highlights = collected_highlights
+  end
+end
+
+class KindleHighlight::Book
+  attr_accessor :asin, :author, :title
+
+  @@amazon_items = Hash.new
+
+  def initialize(item)
+    self.asin = item.attribute("id").value.gsub(/_[0-9]+$/, "")
+    self.author = item.xpath("span[@class='author']").text.gsub("\n", "").gsub(" by ", "").strip
+    self.title  = item.xpath("span/a").text
+
+    @@amazon_items[self.asin] = {:author => author, :title => title}
+  end
+
+  def self.find(asin)
+    @@amazon_items[asin] || {:author => "", :title => ""}
   end
 end
 
@@ -39,20 +59,9 @@ class KindleHighlight::Highlight
     self.annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value 
     self.asin = highlight.xpath("p/span[@class='hidden asin']").text
     self.content = highlight.xpath("span[@class='highlight']").text
-    amazon_item = lookup_or_get_from_cache(self.asin)
-    self.author = amazon_item.item_attributes.author.to_s
-    self.title = amazon_item.item_attributes.title.to_s
-  end
 
-  def lookup_or_get_from_cache(asin)
-    unless @@amazon_items.has_key?(asin)
-      request = Request.new
-      request.locale = 'us'
-      response = ResponseGroup.new('Small')
-      lookup = Amazon::AWS::ItemLookup.new('ASIN', {'ItemId' => asin, 'MerchantId' => 'Amazon'})
-      amazon_item = request.search(lookup, response).item_lookup_response[0].items.item.first
-      @@amazon_items[asin] = amazon_item
-    end
-    @@amazon_items[asin]
+    book = KindleHighlight::Book.find(self.asin)
+    self.author = book[:author]
+    self.title = book[:title]
   end
 end
