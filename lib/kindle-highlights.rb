@@ -7,7 +7,7 @@ class KindleHighlight
 
   DEFAULT_WAIT_TIME = 5
 
-  def initialize(email_address, password, options, &block)
+  def initialize(email_address, password, options = {}, &block)
     @agent = Mechanize.new
     page = @agent.get("https://www.amazon.com/ap/signin?openid.return_to=https%3A%2F%2Fkindle.amazon.com%3A443%2Fauthenticate%2Flogin_callback%3Fwctx%3D%252F&pageId=amzn_kindle&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.assoc_handle=amzn_kindle&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select")
     @amazon_form = page.form('signIn')
