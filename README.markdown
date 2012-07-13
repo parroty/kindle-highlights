@@ -59,7 +59,7 @@ There's currently no Kindle API, so I built a scraper.
 - wait_time : specifies wait time between each page load in seconds (default is 5 seconds)
 - block : call-back function which for each page load completion
 
-**Output (with v0.06)**
+**Output**
 XML output example
 
 	<?xml version="1.0"?>
@@ -87,6 +87,7 @@ XML output example
 * Get Small response group from Amazon (0.0.5)
 * Removed ruby-aaws and used the scraping instead (0.0.6)
 * Added multiple pager load and xml output (0.0.6)
+* Added load/save and replace feature for differential updates (0.0.6)
 
 **TODO**
 
