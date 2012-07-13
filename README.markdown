@@ -27,7 +27,7 @@ There's currently no Kindle API, so I built a scraper.
 		highlight.title # => title of the book from which the highlight is taken
 	end
 
-**Use (with v0.06)**
+**Use - xml outputs**
 
 	require 'kindle-highlights'
 
@@ -39,6 +39,20 @@ There's currently no Kindle API, so I built a scraper.
 	File.open("out.xml", "w") do | f |
 		f.puts kindle.to_xml
 	end
+
+**Use - differential save/load**
+
+	require 'kindle-highlights'
+
+	# to create a new KindleHighlight object, give it your Amazon email address and password
+	kindle = KindleHighlight.new("foo@bar.com", "password", { :page_limit => 100, :wait_time => 2 }) do | h |
+		puts "loading... [#{h.books.last.title}]"
+	end
+
+	# load previous file, merge with the new one, and dump it again.
+	org = KindleHighlight.load("out.dump")
+	kindle.replace!(org)
+	kindle.dump("out.dump")
 
 #### options
 - page_limit : specifies maximum number of pages (books) to be loaded

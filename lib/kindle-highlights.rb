@@ -39,6 +39,18 @@ class KindleHighlight
     end
   end
 
+  def replace!(hash)
+    hash[:books].each do | b |
+      self.books.delete_if { |x| x.asin == b.asin }
+      self.books << b
+    end
+
+    hash[:highlights].each do | h |
+      self.highlights.delete_if { |x| x.annotation_id == h.annotation_id }
+      self.highlights << h
+    end
+  end
+
   def to_xml
     highlights_hash = Hash.new([].freeze)
     self.highlights.each do | h |
@@ -64,6 +76,22 @@ class KindleHighlight
       }
     end
     builder.to_xml
+  end
+
+  def dump(file_name)
+    File.open(file_name, "w") do | f |
+      Marshal.dump(self.highlights, f)
+      Marshal.dump(self.books, f)
+    end
+  end
+
+  def self.load(file_name)
+    f = File.open(file_name)
+    highlights = Marshal.load(f)
+    books      = Marshal.load(f)
+    f.close
+
+    {:books => books, :highlights => highlights}
   end
 
 private
