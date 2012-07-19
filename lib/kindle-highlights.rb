@@ -1,6 +1,8 @@
 require 'rubygems'
 require 'mechanize'
 require 'nokogiri'
+require 'erb'
+require 'ostruct'
 
 class KindleHighlight
   attr_accessor :highlights, :books
@@ -52,10 +54,7 @@ class KindleHighlight
   end
 
   def to_xml
-    highlights_hash = Hash.new([].freeze)
-    self.highlights.each do | h |
-      highlights_hash[h.asin] += [h]
-    end
+    highlights_hash = get_highlights_hash
 
     builder = Nokogiri::XML::Builder.new do |xml|
       xml.books {
@@ -78,6 +77,12 @@ class KindleHighlight
     builder.to_xml
   end
 
+  def to_html
+    file_name = File.dirname(__FILE__) + "/template/kindle.html.erb"
+    namespace = OpenStruct.new(:books => self.books, :highlights => get_highlights_hash)
+    template = ERB.new(File.read(file_name)).result(namespace.instance_eval { binding })
+  end
+
   def dump(file_name)
     File.open(file_name, "w") do | f |
       Marshal.dump(self.highlights, f)
@@ -95,6 +100,14 @@ class KindleHighlight
   end
 
 private
+  def get_highlights_hash
+    hash = Hash.new([].freeze)
+    self.highlights.each do | h |
+      hash[h.asin] += [h]
+    end
+    hash
+  end
+
   def collect_book(page)
     page.search(".//div[@class='bookMain yourHighlightsHeader']").map { |b| Book.new(b) }
   end

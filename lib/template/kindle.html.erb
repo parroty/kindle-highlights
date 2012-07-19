@@ -1,0 +1,29 @@
+<html>
+<head>
+<title>Template HTML</title>
+<meta charset="utf-8">
+<link href="./bootstrap/css/bootstrap.css" rel="stylesheet">
+</head>
+<body>
+
+<h1>Kindle Highlights</h1>
+<br>
+<br>
+
+<table class="table table-striped table-bordered table-condensed">
+  <% books.each do | b | %>
+    <tr>
+      <td colspan="3"><%= b.title %></td>
+    </tr>
+    
+    <% highlights[b.asin].each_with_index do | h, index | %>
+      <tr>
+        <td><%= index %></td>
+        <td><%= h.annotation_id %></td>
+        <td><%= h.content %></td>
+      </tr>
+    <% end %>
+  <% end %>
+</table>
+</body>
+</html>
