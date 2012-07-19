@@ -55,9 +55,9 @@ There's currently no Kindle API, so I built a scraper.
 	if File.exist?("out.dump")
 		list = Marshal.load(File.open("out.dump"))
 		kindle.merge!(list)
-
-		KindleHighlight::HTML.new(:list => kindle.list, :file_name => "out.html").output
 	end
+
+	KindleHighlight::HTML.new(:list => kindle.list, :file_name => "out.html").output
 
 	File.open("out.dump", "w") do | f |
 		Marshal.dump(kindle.list, f)
