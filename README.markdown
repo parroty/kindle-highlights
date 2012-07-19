@@ -27,7 +27,7 @@ There's currently no Kindle API, so I built a scraper.
 		highlight.title # => title of the book from which the highlight is taken
 	end
 
-**Use - xml outputs**
+**Use - xml/html outputs**
 
 	require 'kindle-highlights'
 
@@ -36,9 +36,11 @@ There's currently no Kindle API, so I built a scraper.
 		puts "loading... [#{h.books.last.title}]"
 	end
 
-	File.open("out.xml", "w") do | f |
-		f.puts kindle.to_xml
-	end
+	# xml outputs (needs to create ./xml folder in advance)
+	KindleHighlight::XML.new(:list => list, :output_path => "./xml", :file_name => "out.xml").output
+
+	# html outputs (needs to create ./html folder in advance)
+	KindleHighlight::HTML.new(:list => list, :output_path => "./html", :file_name => "out.html").output
 
 **Use - differential save/load**
 
@@ -50,9 +52,15 @@ There's currently no Kindle API, so I built a scraper.
 	end
 
 	# load previous file, merge with the new one, and dump it again.
-	org = KindleHighlight.load("out.dump")
-	kindle.replace!(org)
-	kindle.dump("out.dump")
+	list = Marshal.load(File.open("out.dump"))
+	kindle.merge!(list)
+
+	KindleHighlight::HTML.new(:list => kindle.list, :file_name => "out.html").output
+
+	File.open("out.dump", "w") do | f |
+		Marshal.dump(kindle.list, f)
+	end
+
 
 #### options
 - page_limit : specifies maximum number of pages (books) to be loaded
