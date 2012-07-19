@@ -15,7 +15,6 @@ class KindleHighlight
     @amazon_form = page.form('signIn')
     @amazon_form.email = email_address
     @amazon_form.password = password
-
     @page_limit = options[:page_limit] || 1
     @wait_time  = options[:wait_time]  || DEFAULT_WAIT_TIME
     @block = block
@@ -53,61 +52,11 @@ class KindleHighlight
     end
   end
 
-  def to_xml
-    highlights_hash = get_highlights_hash
-
-    builder = Nokogiri::XML::Builder.new do |xml|
-      xml.books {
-        self.books.each do | b |
-          xml.book {
-            xml.asin b.asin
-            xml.title b.title
-            xml.author b.author
-
-            highlights_hash[b.asin].each do | h |
-              xml.highlights {
-                xml.annotation_id h.annotation_id
-                xml.content h.content
-              }
-            end
-          }
-        end
-      }
-    end
-    builder.to_xml
-  end
-
-  def to_html
-    file_name = File.dirname(__FILE__) + "/template/kindle.html.erb"
-    namespace = OpenStruct.new(:books => self.books, :highlights => get_highlights_hash)
-    template = ERB.new(File.read(file_name)).result(namespace.instance_eval { binding })
-  end
-
-  def dump(file_name)
-    File.open(file_name, "w") do | f |
-      Marshal.dump(self.highlights, f)
-      Marshal.dump(self.books, f)
-    end
-  end
-
-  def self.load(file_name)
-    f = File.open(file_name)
-    highlights = Marshal.load(f)
-    books      = Marshal.load(f)
-    f.close
-
-    {:books => books, :highlights => highlights}
+  def list
+    List.new(self.books, self.highlights)
   end
 
 private
-  def get_highlights_hash
-    hash = Hash.new([].freeze)
-    self.highlights.each do | h |
-      hash[h.asin] += [h]
-    end
-    hash
-  end
-
   def collect_book(page)
     page.search(".//div[@class='bookMain yourHighlightsHeader']").map { |b| Book.new(b) }
   end
@@ -123,6 +72,25 @@ private
     else
       nil
     end
+  end
+end
+
+class KindleHighlight::List
+  attr_accessor :books, :highlights, :highlights_hash
+
+  def initialize(books, highlights)
+    self.books = books
+    self.highlights = highlights
+    self.highlights_hash = get_highlights_hash
+  end
+
+private
+  def get_highlights_hash
+    hash = Hash.new([].freeze)
+    self.highlights.each do | h |
+      hash[h.asin] += [h]
+    end
+    hash
   end
 end
 
@@ -151,12 +119,44 @@ class KindleHighlight::Highlight
   @@amazon_items = Hash.new
 
   def initialize(highlight)
-    self.annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value 
+    self.annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value
     self.asin = highlight.xpath("p/span[@class='hidden asin']").text
     self.content = highlight.xpath("span[@class='highlight']").text
 
     book = KindleHighlight::Book.find(self.asin)
     self.author = book[:author]
     self.title = book[:title]
+  end
+end
+
+class KindleHighlight::XML
+  def self.convert(list)
+    builder = Nokogiri::XML::Builder.new do | xml |
+      xml.books {
+        list.books.each do | b |
+          xml.book {
+            xml.asin b.asin
+            xml.title b.title
+            xml.author b.author
+
+            list.highlights_hash[b.asin].each do | h |
+              xml.highlights {
+                xml.annotation_id h.annotation_id
+                xml.content h.content
+              }
+            end
+          }
+        end
+      }
+    end
+    builder.to_xml
+  end
+end
+
+class KindleHighlight::HTML
+  def self.convert(list)
+    file_name = File.dirname(__FILE__) + "/template/kindle.html.erb"
+    namespace = OpenStruct.new(:books => list.books, :highlights => list.highlights_hash)
+    template = ERB.new(File.read(file_name)).result(namespace.instance_eval { binding })
   end
 end
