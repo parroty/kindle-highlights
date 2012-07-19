@@ -138,7 +138,7 @@ class KindleHighlight::BaseFormat
   end
 
   def save(str)
-    File.open(@file_name, "w") do | f |
+    File.open([@output_path, @file_name].join("/"), "w") do | f |
       f.puts str
     end
   end
