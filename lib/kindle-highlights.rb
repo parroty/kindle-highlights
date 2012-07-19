@@ -40,13 +40,13 @@ class KindleHighlight
     end
   end
 
-  def merge!(hash)
-    hash[:books].each do | b |
+  def merge!(list)
+    list.books.each do | b |
       self.books.delete_if { |x| x.asin == b.asin }
       self.books << b
     end
 
-    hash[:highlights].each do | h |
+    list.highlights.each do | h |
       self.highlights.delete_if { |x| x.annotation_id == h.annotation_id }
       self.highlights << h
     end
