@@ -41,7 +41,7 @@ class KindleHighlight
     end
   end
 
-  def replace!(hash)
+  def merge!(hash)
     hash[:books].each do | b |
       self.books.delete_if { |x| x.asin == b.asin }
       self.books << b
