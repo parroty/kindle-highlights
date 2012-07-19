@@ -37,10 +37,10 @@ There's currently no Kindle API, so I built a scraper.
 	end
 
 	# xml outputs (needs to create ./xml folder in advance)
-	KindleHighlight::XML.new(:list => list, :output_path => "./xml", :file_name => "out.xml").output
+	KindleHighlight::XML.new(:list => kindle.list, :output_path => "./xml", :file_name => "out.xml").output
 
 	# html outputs (needs to create ./html folder in advance)
-	KindleHighlight::HTML.new(:list => list, :output_path => "./html", :file_name => "out.html").output
+	KindleHighlight::HTML.new(:list => kindle.list, :output_path => "./html", :file_name => "out.html").output
 
 **Use - differential save/load**
 
