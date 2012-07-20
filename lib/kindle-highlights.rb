@@ -95,7 +95,7 @@ private
 end
 
 class KindleHighlight::Book
-  attr_accessor :asin, :author, :title
+  attr_accessor :asin, :author, :title, :last_update
 
   @@amazon_items = Hash.new
 
@@ -103,6 +103,7 @@ class KindleHighlight::Book
     self.asin = item.attribute("id").value.gsub(/_[0-9]+$/, "")
     self.author = item.xpath("span[@class='author']").text.gsub("\n", "").gsub(" by ", "").strip
     self.title  = item.xpath("span/a").text
+    self.last_update = item.xpath("div[@class='lastHighlighted']").text
 
     @@amazon_items[self.asin] = {:author => author, :title => title}
   end
