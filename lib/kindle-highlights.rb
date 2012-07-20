@@ -113,8 +113,7 @@ class KindleHighlight::Book
 end
 
 class KindleHighlight::Highlight
-
-  attr_accessor :annotation_id, :asin, :author, :title, :content
+  attr_accessor :annotation_id, :asin, :author, :title, :content, :location
 
   @@amazon_items = Hash.new
 
@@ -122,6 +121,10 @@ class KindleHighlight::Highlight
     self.annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value
     self.asin = highlight.xpath("p/span[@class='hidden asin']").text
     self.content = highlight.xpath("span[@class='highlight']").text
+
+    if highlight.xpath("a[@class='k4pcReadMore readMore linkOut']").attribute("href").value =~ /location=([0-9]+)$/
+      self.location = $1.to_i
+    end
 
     book = KindleHighlight::Book.find(self.asin)
     self.author = book[:author]
