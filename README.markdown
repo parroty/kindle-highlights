@@ -12,7 +12,7 @@ There's currently no Kindle API, so I built a scraper.
 **Install**
 	
 	gem install kindle-highlights
-**Use**
+**Usage - object operation**
 
 	require 'kindle-highlights'
 
@@ -27,7 +27,7 @@ There's currently no Kindle API, so I built a scraper.
 		highlight.title # => title of the book from which the highlight is taken
 	end
 
-**Use - xml/html outputs**
+**Usage - xml/html outputs**
 
 	require 'kindle-highlights'
 
@@ -42,7 +42,7 @@ There's currently no Kindle API, so I built a scraper.
 	# html outputs (needs to create ./html folder in advance)
 	KindleHighlight::HTML.new(:list => kindle.list, :output_path => "./html", :file_name => "out.html").output
 
-**Use - differential save/load**
+**Usage - differential save/load**
 
 	require 'kindle-highlights'
 
@@ -98,6 +98,7 @@ XML output example
 * Removed ruby-aaws and used the scraping instead (0.0.6)
 * Added multiple pager load and xml output (0.0.6)
 * Added load/save and replace feature for differential updates (0.0.6)
+* Added html output (0.0.6)
 
 **TODO**
 
