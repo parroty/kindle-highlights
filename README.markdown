@@ -69,7 +69,8 @@ There's currently no Kindle API, so I built a scraper.
 - wait_time : specifies wait time between each page load in seconds (default is 5 seconds)
 - block : call-back function which for each page load completion
 
-**Output**
+**Output - xml**
+
 XML output example
 
 	<?xml version="1.0"?>
@@ -88,6 +89,10 @@ XML output example
 			</highlights>
 		</book>
 	</books>
+
+**Output - html**
+
+http://cloud.github.com/downloads/parroty/kindle-highlights/kindle_highlight_html.png
 
 **Updates**
 
