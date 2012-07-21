@@ -84,6 +84,16 @@ class KindleHighlight::List
     self.highlights_hash = get_highlights_hash
   end
 
+  def dump(file_name)
+    File.open(file_name, "w") do | f |
+      Marshal.dump(self, f)
+    end
+  end
+
+  def self.load(file_name)
+    Marshal.load(File.open(file_name))
+  end
+
 private
   def get_highlights_hash
     hash = Hash.new([].freeze)

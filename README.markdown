@@ -53,16 +53,12 @@ There's currently no Kindle API, so I built a scraper.
 
 	# load previous file, merge with the new one, and dump it again.
 	if File.exist?("out.dump")
-		list = Marshal.load(File.open("out.dump"))
+		list = KindleHighlight::List.load("out.dump")
 		kindle.merge!(list)
 	end
 
 	KindleHighlight::HTML.new(:list => kindle.list, :file_name => "out.html").output
-
-	File.open("out.dump", "w") do | f |
-		Marshal.dump(kindle.list, f)
-	end
-
+	kindle.list.dump("out.dump")
 
 #### options
 - page_limit : specifies maximum number of pages (books) to be loaded
