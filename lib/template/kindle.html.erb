@@ -54,7 +54,12 @@
         <% highlights[b.asin].each do | h | %>
           <tr>
             <td><%= h.location %></td>
-            <td><%= h.content %></td>
+            <td>
+              <%= h.content %>
+              <% unless h.note.empty? %>
+                <br/><span style="margin-left:10px" class="label label-info">Note</span><code style="color:black"><%= h.note %></code>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </table>
