@@ -15,6 +15,15 @@
     max-height: 600px;
     overflow: auto;
   }
+
+  span.label-info {
+    margin-left: 10px;
+  }
+
+  code {
+    color: black;
+  }
+
 </style>
 
 </head>
@@ -57,7 +66,7 @@
             <td>
               <%= h.content %>
               <% unless h.note.empty? %>
-                <br/><span style="margin-left:10px" class="label label-info">Note</span><code style="color:black"><%= h.note %></code>
+                <br/><span class="label label-info">Note</span><code><%= h.note %></code>
               <% end %>
             </td>
           </tr>
