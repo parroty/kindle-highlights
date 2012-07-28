@@ -32,8 +32,8 @@ There's currently no Kindle API, so I built a scraper.
 	require 'kindle-highlights'
 
 	# to create a new KindleHighlight object, give it your Amazon email address and password
-	kindle = KindleHighlight.new("foo@bar.com", "password", { :page_limit => 100, :wait_time => 2 }) do | h |
-		puts "loading... [#{h.books.last.title}]"
+	kindle = KindleHighlight.new("foo@bar.com", "password", { :page_limit => 100, :day_limit => 31, :wait_time => 2 }) do | h |
+		puts "loading... [#{h.books.last.title}] - #{h.books.last.last_update}"
 	end
 
 	# xml outputs (needs to create ./xml folder in advance)
@@ -62,6 +62,7 @@ There's currently no Kindle API, so I built a scraper.
 
 #### options
 - page_limit : specifies maximum number of pages (books) to be loaded
+- day_limit : specifies maximum number of days to be retrieved, based on "Last annotated on" date and today
 - wait_time : specifies wait time between each page load in seconds (default is 5 seconds)
 - block : call-back function which for each page load completion
 

@@ -2,6 +2,7 @@ require 'rubygems'
 require 'mechanize'
 require 'nokogiri'
 require 'erb'
+require 'date'
 require 'kindle-highlights/kindle_format'
 
 class KindleHighlight
@@ -15,8 +16,11 @@ class KindleHighlight
     @amazon_form = page.form('signIn')
     @amazon_form.email = email_address
     @amazon_form.password = password
+
     @page_limit = options[:page_limit] || 1
-    @wait_time  = options[:wait_time]  || DEFAULT_WAIT_TIME
+    @day_limit  = options[:day_limit] || 365 * 100  # set default as 100 years
+    @wait_time  = options[:wait_time] || DEFAULT_WAIT_TIME
+
     @block = block
 
     scrape_highlights
@@ -31,6 +35,9 @@ class KindleHighlight
     @page_limit.times do | cnt |
       self.books      += collect_book(highlights_page)
       self.highlights += collect_highlight(highlights_page)
+
+      date_diff_from_today = (Date.today - Date.parse(self.books.last.last_update)).to_i
+      break if date_diff_from_today > @day_limit
 
       highlights_page = get_next_page(highlights_page)
       break unless highlights_page
