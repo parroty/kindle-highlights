@@ -8,7 +8,9 @@ require 'kindle-highlights/kindle_format'
 class KindleHighlight
   attr_accessor :highlights, :books
 
-  DEFAULT_WAIT_TIME = 5
+  DEFAULT_PAGE_LIMIT = 1
+  DEFAULT_DAY_LIMIT  = 365 * 100  # set default as 100 years
+  DEFAULT_WAIT_TIME  = 5
 
   def initialize(email_address, password, options = {}, &block)
     @agent = Mechanize.new
@@ -18,9 +20,9 @@ class KindleHighlight
     @amazon_form.email    = email_address
     @amazon_form.password = password
 
-    @page_limit = options[:page_limit] || 1
-    @day_limit  = options[:day_limit] || 365 * 100  # set default as 100 years
-    @wait_time  = options[:wait_time] || DEFAULT_WAIT_TIME
+    @page_limit = options[:page_limit] || DEFAULT_PAGE_LIMIT
+    @day_limit  = options[:day_limit]  || DEFAULT_DAY_LIMIT
+    @wait_time  = options[:wait_time]  || DEFAULT_WAIT_TIME
 
     @block = block
 
