@@ -14,7 +14,8 @@ class KindleHighlight
     @agent = Mechanize.new
     page = @agent.get("https://www.amazon.com/ap/signin?openid.return_to=https%3A%2F%2Fkindle.amazon.com%3A443%2Fauthenticate%2Flogin_callback%3Fwctx%3D%252F&pageId=amzn_kindle&openid.mode=checkid_setup&openid.ns=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0&openid.identity=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select&openid.pape.max_auth_age=0&openid.assoc_handle=amzn_kindle&openid.claimed_id=http%3A%2F%2Fspecs.openid.net%2Fauth%2F2.0%2Fidentifier_select")
     @amazon_form = page.form('signIn')
-    @amazon_form.email = email_address
+
+    @amazon_form.email    = email_address
     @amazon_form.password = password
 
     @page_limit = options[:page_limit] || 1
@@ -28,15 +29,15 @@ class KindleHighlight
 
   def scrape_highlights
     signin_submission = @agent.submit(@amazon_form)
-    highlights_page = @agent.click(signin_submission.link_with(:text => /Your Highlights/))
+    highlights_page   = @agent.click(signin_submission.link_with(:text => /Your Highlights/))
 
-    self.books      = Array.new
-    self.highlights = Array.new
+    @books = []
+    @highlights = []
     @page_limit.times do | cnt |
-      self.books      += collect_book(highlights_page)
-      self.highlights += collect_highlight(highlights_page)
+      @books      += collect_book(highlights_page)
+      @highlights += collect_highlight(highlights_page)
 
-      date_diff_from_today = (Date.today - Date.parse(self.books.last.last_update)).to_i
+      date_diff_from_today = (Date.today - Date.parse(@books.last.last_update)).to_i
       break if date_diff_from_today > @day_limit
 
       highlights_page = get_next_page(highlights_page)
@@ -49,18 +50,18 @@ class KindleHighlight
 
   def merge!(list)
     list.books.each do | b |
-      self.books.delete_if { |x| x.asin == b.asin }
-      self.books << b
+      @books.delete_if { |x| x.asin == b.asin }
+      @books << b
     end
 
     list.highlights.each do | h |
-      self.highlights.delete_if { |x| x.annotation_id == h.annotation_id }
-      self.highlights << h
+      @highlights.delete_if { |x| x.annotation_id == h.annotation_id }
+      @highlights << h
     end
   end
 
   def list
-    List.new(self.books, self.highlights)
+    List.new(@books, @highlights)
   end
 
 private
@@ -86,9 +87,9 @@ class KindleHighlight::List
   attr_accessor :books, :highlights, :highlights_hash
 
   def initialize(books, highlights)
-    self.books = books
-    self.highlights = highlights
-    self.highlights_hash = get_highlights_hash
+    @books = books
+    @highlights = highlights
+    @highlights_hash = get_highlights_hash
   end
 
   def dump(file_name)
@@ -104,7 +105,7 @@ class KindleHighlight::List
 private
   def get_highlights_hash
     hash = Hash.new([].freeze)
-    self.highlights.each do | h |
+    @highlights.each do | h |
       hash[h.asin] += [h]
     end
     hash
@@ -117,12 +118,12 @@ class KindleHighlight::Book
   @@amazon_items = Hash.new
 
   def initialize(item)
-    self.asin = item.attribute("id").value.gsub(/_[0-9]+$/, "")
-    self.author = item.xpath("span[@class='author']").text.gsub("\n", "").gsub(" by ", "").strip
-    self.title  = item.xpath("span/a").text
-    self.last_update = item.xpath("div[@class='lastHighlighted']").text
+    @asin        = item.attribute("id").value.gsub(/_[0-9]+$/, "")
+    @author      = item.xpath("span[@class='author']").text.gsub("\n", "").gsub(" by ", "").strip
+    @title       = item.xpath("span/a").text
+    @last_update = item.xpath("div[@class='lastHighlighted']").text
 
-    @@amazon_items[self.asin] = {:author => author, :title => title}
+    @@amazon_items[@asin] = {:author => author, :title => title}
   end
 
   def self.find(asin)
@@ -136,17 +137,17 @@ class KindleHighlight::Highlight
   @@amazon_items = Hash.new
 
   def initialize(highlight)
-    self.annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value
-    self.asin = highlight.xpath("p/span[@class='hidden asin']").text
-    self.content = highlight.xpath("span[@class='highlight']").text
-    self.note = highlight.xpath("p/span[@class='noteContent']").text
+    @annotation_id = highlight.xpath("form/input[@id='annotation_id']").attribute("value").value
+    @asin          = highlight.xpath("p/span[@class='hidden asin']").text
+    @content       = highlight.xpath("span[@class='highlight']").text
+    @note          = highlight.xpath("p/span[@class='noteContent']").text
 
     if highlight.xpath("a[@class='k4pcReadMore readMore linkOut']").attribute("href").value =~ /location=([0-9]+)$/
-      self.location = $1.to_i
+      @location = $1.to_i
     end
 
-    book = KindleHighlight::Book.find(self.asin)
-    self.author = book[:author]
-    self.title = book[:title]
+    book = KindleHighlight::Book.find(@asin)
+    @author = book[:author]
+    @title  = book[:title]
   end
 end

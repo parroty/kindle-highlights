@@ -61,5 +61,3 @@ private
     FileUtils.cp_r(src, @output_path)
   end
 end
-
-
